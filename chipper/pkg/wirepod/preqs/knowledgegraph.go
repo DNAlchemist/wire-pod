@@ -167,6 +167,7 @@ func openaiRequest(transcribedText string) string {
 	}
 	var openAIResponse openAIStruct
 	err = json.Unmarshal(body, &openAIResponse)
+	logger.Println("OpenAI response body: " + string(body))
 	if err != nil || len(openAIResponse.Choices) == 0 {
 		logger.Println("OpenAI returned no response.")
 		return "OpenAI returned no response."
