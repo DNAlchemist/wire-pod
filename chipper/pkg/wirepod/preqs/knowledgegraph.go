@@ -131,7 +131,7 @@ func openaiRequest(transcribedText string) string {
 	logger.Println("Request string: " + sendString)
 	url := "https://api.openai.com/v1/completions"
 	formData := `{
-"model": "gpt-3.5-turbo-instruct",
+"model": "gpt-3.5-turbo",
 "prompt": "` + sendString + `",
 "temperature": 0.7,
 "max_tokens": 256,
