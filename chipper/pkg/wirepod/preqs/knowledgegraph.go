@@ -126,7 +126,7 @@ func openaiRequest(transcribedText string) string {
 		dialogueHistoryString += escapedDialogue + " "
 	}
 
-	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
+	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history (context), use it to create response: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
 	logger.Println("Making request to OpenAI...")
 	logger.Println("Request string: " + sendString)
 	url := "https://api.openai.com/v1/completions"
@@ -176,7 +176,7 @@ func openaiRequest(transcribedText string) string {
 	}
 	apiResponse := strings.TrimSpace(openAIResponse.Choices[0].Text)
 	logger.Println("OpenAI response: " + apiResponse)
-	fullDialogue := "Question: " + transcribedText + " Answer: " + apiResponse
+	fullDialogue := "Me: " + transcribedText + " You: " + apiResponse
 	addDialogue(fullDialogue)
 	return apiResponse
 }
