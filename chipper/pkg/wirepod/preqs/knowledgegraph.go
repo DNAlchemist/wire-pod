@@ -125,7 +125,7 @@ func openaiRequest(transcribedText string) string {
 		dialogueHistoryString += dialogue + " "
 	}
 
-	sendString := "You are a helpful robot called Anki " + vars.APIConfig.Knowledge.RobotName + ". You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
+	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
 	logger.Println("Making request to OpenAI...")
 	url := "https://api.openai.com/v1/completions"
 	formData := `{
