@@ -122,7 +122,8 @@ func getAllDialogues() []string {
 func openaiRequest(transcribedText string) string {
 	var dialogueHistoryString string
 	for _, dialogue := range dialoguesHistory {
-		dialogueHistoryString += dialogue + " "
+		escapedDialogue := strings.Replace(dialogue, "\"", "\\\"", -1)
+		dialogueHistoryString += escapedDialogue + " "
 	}
 
 	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
