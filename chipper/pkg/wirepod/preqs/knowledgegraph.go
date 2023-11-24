@@ -155,13 +155,15 @@ func openaiRequest(transcribedText string) string {
 
 	// Define a struct to unmarshal the response
 	type OpenAIChatResponse struct {
-		ID       string `json:"id"`
-		Object   string `json:"object"`
-		Created  int    `json:"created"`
-		Messages []struct {
-			Role    string `json:"role"`
-			Content string `json:"content"`
-		} `json:"messages"`
+		ID      string `json:"id"`
+		Object  string `json:"object"`
+		Created int    `json:"created"`
+		Choises []struct {
+			Message struct {
+				Role    string `json:"role"`
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
 	}
 
 	var openAIResponse OpenAIChatResponse
@@ -173,8 +175,8 @@ func openaiRequest(transcribedText string) string {
 
 	logger.Println("OpenAI response: " + string(body))
 	var apiResponse string
-	if len(openAIResponse.Messages) > 0 {
-		apiResponse = openAIResponse.Messages[len(openAIResponse.Messages)-1].Content
+	if len(openAIResponse.Choises) > 0 {
+		apiResponse = openAIResponse.Choises[len(openAIResponse.Choises)-1].Message.Content
 	} else {
 		apiResponse = "No response from OpenAI."
 	}
