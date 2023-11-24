@@ -122,8 +122,7 @@ func getAllDialogues() []string {
 func openaiRequest(transcribedText string) string {
 	var dialogueHistoryString string
 	for _, dialogue := range dialoguesHistory {
-		escapedDialogue := strings.Replace(dialogue, "\"", "\\\"", -1)
-		dialogueHistoryString += "			" + escapedDialogue + ",\n"
+		dialogueHistoryString += "			" + dialogue + ",\n"
 	}
 
 	bootstrapString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). There may be voice recognition errors, just ignore it. You will be given a question asked by a user and you must provide the best answer you can. It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative."
@@ -185,8 +184,8 @@ func openaiRequest(transcribedText string) string {
 		apiResponse = "No response from OpenAI."
 	}
 
-	addDialogue("{\"user\": \"" + transcribedText + "\"}")
-	addDialogue("{\"assistant\": \"" + apiResponse + "\"}")
+	addDialogue("{\"role\": \"user\": \", \"content\": \"" + strings.Replace(transcribedText, "\"", "\\\"", -1) + "\"}")
+	addDialogue("{\"role\": \"assistant\": \"content\": \"" + strings.Replace(apiResponse, "\"", "\\\"", -1) + "\"}")
 	return apiResponse
 }
 
