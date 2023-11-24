@@ -123,21 +123,25 @@ func openaiRequest(transcribedText string) string {
 	var dialogueHistoryString string
 	for _, dialogue := range dialoguesHistory {
 		escapedDialogue := strings.Replace(dialogue, "\"", "\\\"", -1)
-		dialogueHistoryString += escapedDialogue + " "
+		dialogueHistoryString += "			" + escapedDialogue + ",\n"
 	}
 
-	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). There may be voice recognition errors, just ignore it. You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history (context), use it to create response: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
+	bootstrapString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). There may be voice recognition errors, just ignore it. You will be given a question asked by a user and you must provide the best answer you can. It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative."
 	logger.Println("Making request to OpenAI...")
-	logger.Println("Request string: " + sendString)
+	logger.Println("Request string: " + bootstrapString)
 
 	url := "https://api.openai.com/v1/chat/completions"
 
 	formData := `{
         "model": "gpt-3.5-turbo",
         "messages": [
-            {"role": "system", "content": "` + sendString + `"}
+            {"role": "system", "content": "` + bootstrapString + `"},
+			` + dialogueHistoryString + `
+			{"role": "user", "content": "` + transcribedText + `"}
         ]
     }`
+
+	logger.Println("Request body: " + formData)
 
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(formData)))
 	req.Header.Set("Content-Type", "application/json")
@@ -181,8 +185,8 @@ func openaiRequest(transcribedText string) string {
 		apiResponse = "No response from OpenAI."
 	}
 
-	fullDialogue := "Me: " + transcribedText + " You: " + apiResponse
-	addDialogue(fullDialogue)
+	addDialogue("{\"user\": \"" + transcribedText + "\"}")
+	addDialogue("{\"assistant\": \"" + apiResponse + "\"}")
 	return apiResponse
 }
 
