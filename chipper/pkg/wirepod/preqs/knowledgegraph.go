@@ -129,19 +129,20 @@ func openaiRequest(transcribedText string) string {
 	sendString := "You are a helpful robot called " + vars.APIConfig.Knowledge.RobotName + " (by Anki). There may be voice recognition errors, just ignore it. You will be given a question asked by a user and you must provide the best answer you can. Here is the conversation history (context), use it to create response: " + dialogueHistoryString + " It may not be punctuated or spelled correctly as the STT model is small. The answer will be put through TTS, so it should be a speakable string. Keep the answer concise yet informative. Here is the question: " + "\\" + "\"" + transcribedText + "\\" + "\"" + " , Answer: "
 	logger.Println("Making request to OpenAI...")
 	logger.Println("Request string: " + sendString)
-	url := "https://api.openai.com/v1/completions"
+
+	url := "https://api.openai.com/v1/chat/completions"
+
 	formData := `{
-"model": "gpt-3.5-turbo-instruct",
-"prompt": "` + sendString + `",
-"temperature": 0.7,
-"max_tokens": 256,
-"top_p": 1,
-"frequency_penalty": 0.2,
-"presence_penalty": 0
-}`
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {"role": "system", "content": "` + sendString + `"}
+        ]
+    }`
+
 	req, _ := http.NewRequest("POST", url, bytes.NewBuffer([]byte(formData)))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+vars.APIConfig.Knowledge.Key)
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -149,33 +150,35 @@ func openaiRequest(transcribedText string) string {
 		return "There was an error making the request to OpenAI."
 	}
 	defer resp.Body.Close()
+
 	body, _ := io.ReadAll(resp.Body)
-	type openAIStruct struct {
-		ID      string `json:"id"`
-		Object  string `json:"object"`
-		Created int    `json:"created"`
-		Model   string `json:"model"`
-		Choices []struct {
-			Text         string      `json:"text"`
-			Index        int         `json:"index"`
-			Logprobs     interface{} `json:"logprobs"`
-			FinishReason string      `json:"finish_reason"`
-		} `json:"choices"`
-		Usage struct {
-			PromptTokens     int `json:"prompt_tokens"`
-			CompletionTokens int `json:"completion_tokens"`
-			TotalTokens      int `json:"total_tokens"`
-		} `json:"usage"`
+
+	// Define a struct to unmarshal the response
+	type OpenAIChatResponse struct {
+		ID       string `json:"id"`
+		Object   string `json:"object"`
+		Created  int    `json:"created"`
+		Messages []struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		} `json:"messages"`
 	}
-	var openAIResponse openAIStruct
+
+	var openAIResponse OpenAIChatResponse
 	err = json.Unmarshal(body, &openAIResponse)
-	logger.Println("OpenAI response body: " + string(body))
-	if err != nil || len(openAIResponse.Choices) == 0 {
-		logger.Println("OpenAI returned no response.")
-		return "OpenAI returned no response."
+	if err != nil {
+		logger.Println("Error unmarshalling OpenAI response: " + err.Error())
+		return "Error processing OpenAI response."
 	}
-	apiResponse := strings.TrimSpace(openAIResponse.Choices[0].Text)
-	logger.Println("OpenAI response: " + apiResponse)
+
+	logger.Println("OpenAI response: " + string(body))
+	var apiResponse string
+	if len(openAIResponse.Messages) > 0 {
+		apiResponse = openAIResponse.Messages[len(openAIResponse.Messages)-1].Content
+	} else {
+		apiResponse = "No response from OpenAI."
+	}
+
 	fullDialogue := "Me: " + transcribedText + " You: " + apiResponse
 	addDialogue(fullDialogue)
 	return apiResponse
