@@ -184,8 +184,8 @@ func openaiRequest(transcribedText string) string {
 		apiResponse = "No response from OpenAI."
 	}
 
-	addDialogue("{\"role\": \"user\": \", \"content\": \"" + strings.Replace(transcribedText, "\"", "\\\"", -1) + "\"}")
-	addDialogue("{\"role\": \"assistant\": \"content\": \"" + strings.Replace(apiResponse, "\"", "\\\"", -1) + "\"}")
+	addDialogue("{\"role\": \"user\", \"content\": \"" + strings.Replace(transcribedText, "\"", "\\\"", -1) + "\"}")
+	addDialogue("{\"role\": \"assistant\", \"content\": \"" + strings.Replace(apiResponse, "\"", "\\\"", -1) + "\"}")
 	return apiResponse
 }
 
