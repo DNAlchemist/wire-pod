@@ -113,6 +113,9 @@ var dialoguesHistory []string
 
 func addDialogue(dialogue string) {
 	dialoguesHistory = append(dialoguesHistory, dialogue)
+	if len(dialoguesHistory) > 10 {
+		dialoguesHistory = dialoguesHistory[1:]
+	}
 }
 
 func getAllDialogues() []string {
