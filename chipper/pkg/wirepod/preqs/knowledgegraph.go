@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	pb "github.com/digital-dream-labs/api/go/chipperpb"
 	"github.com/kercre123/chipper/pkg/logger"
@@ -123,6 +124,8 @@ func getAllDialogues() []string {
 }
 
 func openaiRequest(transcribedText string) string {
+	startTime := time.Now()
+
 	var dialogueHistoryString string
 	for _, dialogue := range dialoguesHistory {
 		dialogueHistoryString += "            " + dialogue + ",\n"
@@ -189,6 +192,10 @@ func openaiRequest(transcribedText string) string {
 
 	addDialogue("{\"role\": \"user\", \"content\": \"" + strings.Replace(transcribedText, "\"", "\\\"", -1) + "\"}")
 	addDialogue("{\"role\": \"assistant\", \"content\": \"" + apiResponse + "\"}")
+
+	duration := time.Since(startTime)
+	logger.Printf("Request to OpenAI completed in %v\n", duration)
+
 	return apiResponse
 }
 
