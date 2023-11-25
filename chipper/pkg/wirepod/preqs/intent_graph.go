@@ -39,8 +39,17 @@ func (s *Server) ProcessIntentGraph(req *vtt.IntentGraphRequest) (*vtt.IntentGra
 	if !successMatched {
 		logger.Println("No intent was matched.")
 		if vars.APIConfig.Knowledge.Enable && vars.APIConfig.Knowledge.Provider == "openai" && len([]rune(transcribedText)) >= 8 {
+			firstResponse := &pb.IntentGraphResponse{
+				Session:      req.Session,
+				DeviceId:     req.Device,
+				ResponseType: pb.IntentGraphMode_KNOWLEDGE_GRAPH,
+				SpokenText:   "Let me think about that."
+				QueryText:    transcribedText,
+				IsFinal:      false,
+			}
+			req.Stream.Send(firstResponse)
 			apiResponse := openaiRequest(transcribedText)
-			response := &pb.IntentGraphResponse{
+			secondResponse := &pb.IntentGraphResponse{
 				Session:      req.Session,
 				DeviceId:     req.Device,
 				ResponseType: pb.IntentGraphMode_KNOWLEDGE_GRAPH,
@@ -48,7 +57,7 @@ func (s *Server) ProcessIntentGraph(req *vtt.IntentGraphRequest) (*vtt.IntentGra
 				QueryText:    transcribedText,
 				IsFinal:      true,
 			}
-			req.Stream.Send(response)
+			req.Stream.Send(secondResponse)
 			return nil, nil
 		}
 		ttr.IntentPass(req, "intent_system_noaudio", transcribedText, map[string]string{"": ""}, false)
