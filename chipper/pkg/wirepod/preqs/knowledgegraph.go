@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -125,6 +126,7 @@ func getAllDialogues() []string {
 
 func openaiRequest(transcribedText string) string {
 	startTime := time.Now()
+	debug.PrintStack()
 
 	var dialogueHistoryString string
 	for _, dialogue := range dialoguesHistory {
