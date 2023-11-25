@@ -43,7 +43,7 @@ func (s *Server) ProcessIntentGraph(req *vtt.IntentGraphRequest) (*vtt.IntentGra
 				Session:      req.Session,
 				DeviceId:     req.Device,
 				ResponseType: pb.IntentGraphMode_KNOWLEDGE_GRAPH,
-				SpokenText:   "Let me think about that."
+				SpokenText:   "Let me think about that.",
 				QueryText:    transcribedText,
 				IsFinal:      false,
 			}
