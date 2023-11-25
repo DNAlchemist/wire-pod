@@ -191,7 +191,7 @@ func openaiRequest(transcribedText string) string {
 	}
 
 	addDialogue("{\"role\": \"user\", \"content\": \"" + strings.Replace(transcribedText, "\"", "\\\"", -1) + "\"}")
-	addDialogue("{\"role\": \"assistant\", \"content\": \"" + apiResponse + "\"}")
+	addDialogue("{\"role\": \"assistant\", \"content\": \"" + strings.Replace(apiResponse, "\"", "\\\"", -1) + "\"}")
 
 	duration := time.Since(startTime)
 	logger.Println("Request to OpenAI completed in " + duration.String())
