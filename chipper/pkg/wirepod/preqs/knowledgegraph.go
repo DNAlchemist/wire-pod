@@ -140,7 +140,7 @@ func openaiRequest(transcribedText string) string {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	formData := `{
-        "model": "gpt-3.5-turbo-instruct",
+        "model": "gpt-3.5-turbo",
         "messages": [
             {"role": "system", "content": "` + bootstrapString + `"},
 			` + dialogueHistoryString + `
